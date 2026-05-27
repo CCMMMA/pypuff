@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pypuff"
+version = "0.4.3"
+description = "Clean-room pure Python puff and dispersion modeling toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Raffaele Montella / contributors"}]
+keywords = ["PyPuff", "PyWRF", "PyMET", "CALPUFF", "CALMET", "CALPOST", "CALWRF", "MAKEGEO", "CTGPROC", "air-quality", "atmospheric-science"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = ["numpy>=1.23", "pyproj>=3.4"]
+
+[project.optional-dependencies]
+netcdf = ["netCDF4>=1.6"]
+viz = ["matplotlib>=3.7"]
+mpi = ["mpi4py>=3.1"]
+dev = ["pytest>=7", "ruff>=0.4", "mypy>=1.8", "build>=1.0", "matplotlib>=3.7"]
+
+[project.scripts]
+pypuff = "pypuff.cli:main"
+pycalmet = "pypuff.cli:calmet_main"
+pypuff-model = "pypuff.cli:calpuff_main"
+pycalpost = "pypuff.cli:calpost_main"
+pypuff-particles = "pypuff.cli:pypuff_particles_main"
+pypuff-plot = "pypuff.cli:plot_main"
+pycalwrf = "pypuff.cli:calwrf_main"
+pyctgproc = "pypuff.cli:ctgproc_main"
+pymakegeo-lite = "pypuff.cli:makegeo_main"
+pypuff-usecase-wind = "pypuff.usecases.high_resolution_wind:main"
+pypuff-usecase-wildfire = "pypuff.usecases.wildfire:main"
+pypuff-usecase-evaluate = "pypuff.usecases.model_evaluation:main"
+pypuff-doctor = "pypuff.doctor:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pypuff = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true

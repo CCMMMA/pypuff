@@ -1,0 +1,6 @@
+PyPuff is an independent clean-room Python implementation inspired by public
+CALPUFF modeling-system concepts and file roles. It does not contain, translate,
+embed, or redistribute original CALPUFF Fortran source code, executables,
+manuals, sample data, or proprietary parameter tables. CALPUFF, CALMET,
+CALPOST, and related names are referenced only to describe interoperability and
+migration concepts.

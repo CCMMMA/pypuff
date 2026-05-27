@@ -1,0 +1,73 @@
+{
+  "grid": {
+    "nx": 5,
+    "ny": 4,
+    "dx": 500.0,
+    "dy": 500.0,
+    "x0": 0.0,
+    "y0": 0.0,
+    "projection": "LOCAL"
+  },
+  "stations": [
+    {
+      "id": "S1",
+      "x": 0.0,
+      "y": 0.0,
+      "wind_speed": 3.0,
+      "wind_dir": 270.0,
+      "temperature": 294.0,
+      "mixing_height": 900.0
+    },
+    {
+      "id": "S2",
+      "x": 2000.0,
+      "y": 1500.0,
+      "wind_speed": 4.0,
+      "wind_dir": 260.0,
+      "temperature": 296.0,
+      "mixing_height": 1100.0
+    }
+  ],
+  "sources": [
+    {
+      "id": "P1",
+      "x": 100.0,
+      "y": 1000.0,
+      "z": 0.0,
+      "emission_rate": 25.0,
+      "stack_height": 40.0,
+      "source_type": "point",
+      "stack_diameter": 1.5,
+      "exit_velocity": 12.0,
+      "exit_temperature": 370.0,
+      "deposition_velocity": 0.001,
+      "wet_scavenging": 1e-05,
+      "decay_rate": 0.0
+    }
+  ],
+  "receptors": [
+    {
+      "id": "R1",
+      "x": 1000.0,
+      "y": 1000.0,
+      "z": 1.5
+    },
+    {
+      "id": "R2",
+      "x": 2000.0,
+      "y": 1000.0,
+      "z": 1.5
+    }
+  ],
+  "run": {
+    "stability": "D",
+    "threshold": 1e-05,
+    "particles": 1000,
+    "seed": 42,
+    "particle_duration_s": 3600.0,
+    "preferred_interchange": "NetCDF-CF",
+    "numerical_mode": "puff",
+    "averaging_time_s": 3600.0,
+    "stack_tip_downwash": true
+  }
+}

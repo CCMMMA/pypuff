@@ -1,0 +1,39 @@
+# Input, output, and configuration compatibility
+
+The suite has one configuration model shared by CALWRF, CTGPROC, MAKEGEO, CALMET, CALPUFF, the particle alternative, CALPOST, and visualization tools.
+
+## Original Fortran suite files
+
+The Python implementation accepts the same *classes* of files used by the original suite:
+
+- CALPUFF/CALMET-style control files with `KEY = VALUE`, `KEY: VALUE`, or whitespace-separated records and `!` comments;
+- station, source, receptor, grid, stability, threshold, and run-control keys used in the examples;
+- CSV/text concentration tables that preserve receptor and concentration columns;
+- WRF/NetCDF inputs inspected by CALWRF-style adapters;
+- ASCII raster inputs for CTGPROC/MAKEGEO-style terrain and land-use preprocessing.
+
+This is not a byte-for-byte parser for every historical Fortran control record. Unknown keys are preserved in `SuiteConfig.raw` / `run` so projects can extend parsers without breaking old input decks.
+
+## Preferred interoperability format: NetCDF-CF
+
+New module-to-module exchange prefers NetCDF-CF:
+
+- CALMET writes `meteo.nc` with `eastward_wind`, `northward_wind`, `air_temperature`, and `atmosphere_boundary_layer_thickness`.
+- CALPUFF and `pypuff-particles` read `meteo.nc` and write `concentration.nc`.
+- CALPOST and visualization read NetCDF concentration files directly.
+
+When the optional `netCDF4` dependency is not installed, `.nc` writes fall back to a deterministic CF-shaped JSON payload so the core package remains usable in minimal CI environments. Install `.[netcdf]` for true NetCDF files.
+
+## File-format selection
+
+All production commands infer format from extension and also accept explicit format flags. Use `.nc` for NetCDF-CF, `.json` for JSON diagnostics, `.csv` for tabular concentration files, and extensionless/legacy names for Fortran-style text tables.
+
+## WRF5 d03 archive input
+
+PyWRF can download and read WRF5 d03 history files from the meteo@uniparthenope archive.  The URL pattern is:
+
+```text
+https://data.meteo.uniparthenope.it/files/wrf5/d03/history/YYYY/MM/DD/wrf5_d03_YYYYMMDDZhh00.nc
+```
+
+The downloader stores files locally and the PyWRF reader accepts common WRF near-surface wind variables (`U10`/`V10`, `WSPD10`/`WDIR10`) and CF-like wind names.  PyMET converts those fields into the NetCDF-CF local product used by the rest of PyPuff.
