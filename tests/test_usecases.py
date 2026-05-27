@@ -1,11 +1,19 @@
+from __future__ import annotations
+
+import sys
 from pathlib import Path
 
 import numpy as np
 
 from pypuff.io.jsonio import write_json
-from pypuff.usecases.high_resolution_wind import interpolate_wrf_to_100m
-from pypuff.usecases.model_evaluation import evaluate_wildfire_event
-from pypuff.usecases.wildfire import build_wildfire_config, run_wildfire_event
+from pypuff.models import pywrf
+
+USECASES = Path(__file__).resolve().parents[1] / "usecases"
+sys.path.insert(0, str(USECASES))
+
+from high_resolution_wind import interpolate_wrf_to_100m, resolve_wrf_input  # noqa: E402
+from model_evaluation import evaluate_wildfire_event  # noqa: E402
+from wildfire import build_wildfire_config, run_wildfire_event  # noqa: E402
 
 
 def test_high_resolution_wind_json_synthetic(tmp_path: Path) -> None:
@@ -74,9 +82,6 @@ def test_evaluate_wildfire_event(tmp_path: Path) -> None:
     assert result["metrics"]["accuracy"] >= 0.5
     assert "ai_calibration" in result
 
-from pypuff.models import pywrf
-from pypuff.usecases.high_resolution_wind import resolve_wrf_input
-
 
 def test_meteo_uniparthenope_url_builder() -> None:
     assert pywrf.meteo_uniparthenope_wrf_url("2026-05-27", 0).endswith(
@@ -91,3 +96,7 @@ def test_resolve_wrf_input_prefers_local_path(tmp_path: Path) -> None:
     wrf = tmp_path / "wrf5_d03_20260527Z0000.nc"
     wrf.write_bytes(b"placeholder")
     assert resolve_wrf_input(wrf, download_date="2026-05-27") == wrf
+
+
+def test_usecases_are_not_packaged_as_suite_modules() -> None:
+    assert not (Path("src/pypuff/usecases")).exists()

@@ -8,7 +8,7 @@ from typing import Sequence
 from .config import load_config
 from .exceptions import PyPuffError
 from .logging import configure_logging
-from .models import calmet, calpost, calpuff, calwrf, ctgproc, makegeo, particles, visualization
+from .models import calmet, calpost, calpuff, calwrf, ctgproc, makegeo, particles, pyterrel, visualization
 from .workflow import run_workflow
 from .parallel import get_mpi_context
 from .doctor import run_diagnostics, format_report
@@ -125,6 +125,42 @@ def ctgproc_main(argv: Sequence[str] | None = None) -> int:
 
     return _guard(run, argv)
 
+
+
+def pyterrel_main(argv: Sequence[str] | None = None) -> int:
+    def run(argv_: Sequence[str] | None) -> int:
+        parser = argparse.ArgumentParser(description="Build a PyTerrel terrain product on a local modeling grid")
+        parser.add_argument("--terrain", required=True, help="ASCII terrain raster")
+        parser.add_argument("--output", required=True, help="NetCDF-CF or JSON terrain product")
+        parser.add_argument("--center-lat", type=float, required=True)
+        parser.add_argument("--center-lon", type=float, required=True)
+        parser.add_argument("--nx", type=int, default=101)
+        parser.add_argument("--ny", type=int, default=101)
+        parser.add_argument("--dx", type=float, default=100.0)
+        parser.add_argument("--dy", type=float, default=100.0)
+        parser.add_argument("--source-dx", type=float, default=100.0)
+        parser.add_argument("--source-dy", type=float, default=None)
+        parser.add_argument("--json", action="store_true", help="write JSON even when netCDF4 is available")
+        parser.add_argument("--verbose", action="store_true")
+        args = parser.parse_args(argv_)
+        configure_logging(args.verbose)
+        result = pyterrel.run(
+            args.terrain,
+            args.output,
+            center_lat=args.center_lat,
+            center_lon=args.center_lon,
+            nx=args.nx,
+            ny=args.ny,
+            dx_m=args.dx,
+            dy_m=args.dy,
+            source_dx_m=args.source_dx,
+            source_dy_m=args.source_dy,
+            prefer_netcdf=not args.json,
+        )
+        print(result)
+        return 0
+
+    return _guard(run, argv)
 
 def makegeo_main(argv: Sequence[str] | None = None) -> int:
     def run(argv_: Sequence[str] | None) -> int:

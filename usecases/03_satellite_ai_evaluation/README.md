@@ -1,68 +1,43 @@
-# Use case 03 - Model evaluation with satellite images and artificial intelligence
+# Use case 03 — Satellite and AI-supported model evaluation
 
-## Purpose
+Goal: evaluate a PyPuff wildfire/arson simulation against satellite-derived evidence such as smoke masks, burned-area masks, or active-fire probability grids.
 
-Evaluate a PyPuff wildfire/arson simulation against a satellite-derived smoke, fire, hot-spot, or burned-area mask.  The use case supports transparent verification metrics and a deterministic AI-style calibration layer that can be replaced by a more advanced ML model in operational deployments.
+The workflow is didactic and auditable:
 
-## Workflow
+1. **Run use case 02.** Produce a PyPuff concentration file.
+2. **Prepare satellite evidence.** Provide a 2-D probability or binary mask in JSON, NPY, CSV, TXT, or ASCII numeric format.
+3. **Map model output to probabilities.** The script converts model concentrations to a normalized probability field.
+4. **Compare model and observation.** It computes a confusion matrix and skill scores.
+5. **Apply lightweight AI calibration.** A deterministic logistic calibration reports how much a simple learned transform improves alignment.
+6. **Write a report.** The output JSON records inputs, thresholds, metrics, and calibration parameters.
 
-```text
-PyPuff concentration/deposition product + satellite mask -> thresholding -> confusion matrix -> skill metrics -> AI calibration report
-```
-
-## Inputs
-
-1. Concentration file from use case 02 or any PyPuff run.  Supported formats include JSON/CSV/TXT/NetCDF-CF-compatible fallback products.
-2. Satellite-derived mask.  Supported formats:
-   - JSON with a `mask` array
-   - `.npy`
-   - CSV, TXT, or numeric ASCII grids
-3. Optional threshold used to convert concentration into modeled affected/not-affected pixels.
-
-The satellite mask should be georeferenced and resampled consistently with the PyPuff receptor or grid product before formal evaluation.  This example focuses on the verification logic, not satellite retrieval physics.
-
-## Demo mask
-
-Create a deterministic demonstration mask:
+## Create a tiny demo mask
 
 ```bash
-python make_demo_mask.py --output output/satellite_mask.json --nx 20 --ny 20
+python usecases/03_satellite_ai_evaluation/make_demo_mask.py output/demo_mask.json
 ```
 
 ## Run evaluation
 
 ```bash
-pypuff-usecase-evaluate \
+python usecases/03_satellite_ai_evaluation/run.py \
   --concentration output/wildfire_case/model/concentration.nc \
-  --satellite-mask output/satellite_mask.json \
-  --output output/evaluation.json \
-  --threshold 0.1
+  --satellite-mask output/demo_mask.json \
+  --output output/wildfire_case/evaluation.json \
+  --threshold 0.5
 ```
 
-## Metrics
+## Metrics reported
 
-The report includes:
+- confusion matrix: true positive, false positive, true negative, false negative;
+- accuracy;
+- precision;
+- recall / probability of detection;
+- F1 score;
+- critical success index;
+- false-alarm ratio;
+- deterministic logistic calibration weight, bias, and RMSE.
 
-- confusion matrix: true positives, false positives, false negatives, true negatives
-- accuracy
-- precision
-- recall / probability of detection
-- F1 score
-- CSI / threat score
-- false-alarm ratio
-- deterministic AI calibration parameters and calibrated scores
+## AI boundary
 
-## AI layer
-
-The included AI layer is intentionally lightweight and deterministic.  It behaves like a reproducible logistic calibration model over concentration-derived features.  In production, replace it with a trained model that documents:
-
-- satellite sensor and product version
-- cloud/smoke/burned-area uncertainty
-- training/validation split
-- calibration period
-- spatial resolution and reprojection method
-- false-alarm handling
-
-## Operational caveats
-
-Satellite images do not observe ground-level concentration directly.  They may detect thermal anomalies, smoke optical depth, burned area, or qualitative plume presence.  Use the metrics as evidence for model evaluation, not as a standalone regulatory validation.
+The included AI layer is intentionally lightweight and dependency-free. Production satellite evaluation can replace it with a richer classifier or segmentation model, but should keep the same audit trail: input source, preprocessing, threshold, validation split, and calibration metrics.

@@ -37,3 +37,8 @@ https://data.meteo.uniparthenope.it/files/wrf5/d03/history/YYYY/MM/DD/wrf5_d03_Y
 ```
 
 The downloader stores files locally and the PyWRF reader accepts common WRF near-surface wind variables (`U10`/`V10`, `WSPD10`/`WDIR10`) and CF-like wind names.  PyMET converts those fields into the NetCDF-CF local product used by the rest of PyPuff.
+
+
+## PyTerrel terrain preprocessing
+
+PyTerrel is included as `pypuff.models.pyterrel` and the `pyterrel` CLI. It provides clean-room TERREL-role terrain interpolation and NetCDF-CF/JSON terrain outputs for PyMET, MAKEGEO, and dispersion workflows.

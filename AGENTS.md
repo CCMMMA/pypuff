@@ -171,3 +171,8 @@ When improving the repository, prefer this order:
 5. Update docs.
 6. Keep optional dependencies optional.
 
+
+
+## PyTerrel and didactic use cases
+
+PyTerrel is a core clean-room suite model under `src/pypuff/models/pyterrel.py` and covers terrain interpolation/preprocessing in the former TERREL role. Didactic use cases must remain under the repository-level `usecases/` folder only. Do not add `src/pypuff/usecases` or install use-case entry points; use-case scripts should import production suite APIs and keep scenario orchestration outside the package namespace.

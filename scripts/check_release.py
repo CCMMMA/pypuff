@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = [
     "README.md",
+    "requirements.txt",
     "AGENTS.md",
     "LICENSE",
     "NOTICE",
@@ -15,11 +16,13 @@ REQUIRED = [
     "docs/validation.md",
     "docs/usecases.md",
     "docs/pywrf_pymet.md",
+    "docs/pyterrel.md",
     "usecases/README.md",
     "usecases/01_high_resolution_wind_field/README.md",
     "usecases/02_wildfire_arson_effects/README.md",
     "usecases/03_satellite_ai_evaluation/README.md",
     "src/pypuff/py.typed",
+    "src/pypuff/models/pyterrel.py",
 ]
 
 
@@ -39,6 +42,8 @@ def main() -> int:
             errors.append(f"release tree contains generated artifact/cache: {rel}")
         if path.suffix == ".nc":
             errors.append(f"release tree contains NetCDF data product: {rel}")
+        if rel.parts[:2] == ("src", "pypuff") and len(rel.parts) > 2 and rel.parts[2] == "usecases":
+            errors.append(f"use cases must not be packaged as suite modules: {rel}")
     if errors:
         print("release check failed", file=sys.stderr)
         for error in errors:

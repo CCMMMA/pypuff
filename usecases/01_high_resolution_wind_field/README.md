@@ -1,109 +1,74 @@
-# Use case 01 - High-resolution wind field interpolation
+# Use case 01 — High-resolution wind-field interpolation
 
-## Purpose
+Goal: obtain a local 100 m wind field centered on a user-supplied latitude and longitude, starting from a 1 km WRF5 d03 file.
 
-Create a 100 m near-surface wind product centered at a user-provided latitude and longitude, starting from a 1 km WRF5 d03 NetCDF field.  This use case is the meteorological foundation for urban smoke, fire, arson, odour, and accidental-release scenarios where the WRF grid is too coarse for local receptor placement.
+This didactic workflow is deliberately explicit:
 
-## Clean-room module chain
+1. **Acquire WRF 1 km data.** Use a local WRF NetCDF file or download from the meteo@uniparthenope archive.
+2. **PyWRF step.** Extract latitude, longitude, and near-surface wind components from the WRF file.
+3. **PyMET step.** Build a local azimuthal-equidistant grid centered on the requested coordinate.
+4. **Interpolation step.** Interpolate PyWRF wind vectors onto the PyMET 100 m grid.
+5. **Output step.** Write NetCDF-CF by default, or JSON for lightweight runs.
 
-This use case explicitly follows the new PyPuff naming and architecture:
-
-```text
-WRF5 d03 NetCDF -> PyWRF -> PyMET -> NetCDF-CF local wind product
-```
-
-- **PyWRF** replaces the former CALWRF role.  It reads WRF variables such as `XLAT`, `XLONG`, `U10`, `V10`, `WSPD10`, and `WDIR10` and normalizes them into a typed Python wind field.
-- **PyMET** replaces the former CALMET role for this use case.  It creates an azimuthal-equidistant local grid centered on the requested coordinate and interpolates PyWRF vectors onto the 100 m grid.
-
-No original Fortran source code is copied or translated.
-
-## Input data
-
-A WRF NetCDF file must contain one of these variable combinations:
-
-- `XLAT`/`XLONG` and `U10`/`V10`
-- `XLAT`/`XLONG` and `WSPD10`/`WDIR10`
-- CF-style `latitude`/`longitude` and `eastward_wind`/`northward_wind`
-
-The preferred WRF 1 km source is the meteo@uniparthenope WRF5 d03 history archive:
+The WRF archive pattern is:
 
 ```text
 https://data.meteo.uniparthenope.it/files/wrf5/d03/history/YYYY/MM/DD/wrf5_d03_YYYYMMDDZhh00.nc
 ```
 
-## Download and run
-
-Download and process a cycle directly:
+## Run with automatic download
 
 ```bash
-pypuff-usecase-wind \
+python usecases/01_high_resolution_wind_field/run.py \
   --download-date 2026-05-27 \
   --download-cycle-hour 0 \
   --download-dir data/wrf \
   --output output/wrf_100m_wind.nc \
   --center-lat 40.85 \
   --center-lon 14.27 \
-  --nx 101 \
-  --ny 101 \
-  --dx 100 \
-  --dy 100
+  --nx 101 --ny 101 \
+  --dx 100 --dy 100
 ```
 
-Print the exact archive URL without downloading:
+## Print the URL without downloading
 
 ```bash
-pypuff-usecase-wind \
+python usecases/01_high_resolution_wind_field/run.py \
   --download-date 2026-05-27 \
   --download-cycle-hour 0 \
-  --output output/placeholder.nc \
+  --output ignored.nc \
   --center-lat 40.85 \
   --center-lon 14.27 \
   --print-download-url
 ```
 
-Use an already downloaded WRF file:
+## Run with an existing WRF file
 
 ```bash
-pypuff-usecase-wind \
+python usecases/01_high_resolution_wind_field/run.py \
   --wrf data/wrf/wrf5_d03_20260527Z0000.nc \
   --output output/wrf_100m_wind.nc \
   --center-lat 40.85 \
   --center-lon 14.27
 ```
 
-Dependency-light smoke test without WRF data:
+## Classroom/demo run without WRF data
 
 ```bash
-python run.py \
-  --output output/wrf_100m_wind.json \
+python usecases/01_high_resolution_wind_field/run.py \
+  --allow-synthetic \
+  --json \
+  --output output/demo_wind.json \
   --center-lat 40.85 \
   --center-lon 14.27 \
-  --json \
-  --allow-synthetic
+  --nx 21 --ny 21
 ```
 
-Synthetic mode is deterministic and is only for tests and demonstrations.
+## Expected products
 
-## Output
+- `wrf_100m_wind.nc` or `.json`
+- variables/fields: `latitude`, `longitude`, `eastward_wind`, `northward_wind`, `wind_speed`, `wind_from_direction`
 
-Default output is NetCDF-CF when `netCDF4` is installed.  The file contains:
+## Teaching notes
 
-- local `x` and `y` coordinates in metres
-- `latitude` and `longitude`
-- `eastward_wind`
-- `northward_wind`
-- `wind_speed`
-- `wind_from_direction`
-- metadata describing the PyWRF → PyMET pipeline and source WRF file
-
-JSON fallback contains the same physical fields as arrays and metadata.
-
-## Quality checks
-
-Before using the product operationally:
-
-1. Verify that the WRF cycle covers the event time.
-2. Inspect the center-cell wind speed and direction.
-3. Plot the resulting vectors and compare with available observations.
-4. Check coastal and orographic areas carefully; inverse-distance interpolation is deterministic and robust but not a full dynamic downscaling model.
-5. Store the WRF archive URL, cycle hour, PyPuff version, and command line in the case record.
+The script uses production modules `pypuff.models.pywrf` and `pypuff.models.pymet`, but the scenario orchestration lives only in this folder. This keeps the suite compact and keeps educational workflows easy to inspect.

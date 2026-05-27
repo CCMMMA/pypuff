@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pypuff"
-version = "0.4.3"
+version = "0.4.4"
 description = "Clean-room pure Python puff and dispersion modeling toolkit"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -40,9 +40,7 @@ pypuff-plot = "pypuff.cli:plot_main"
 pycalwrf = "pypuff.cli:calwrf_main"
 pyctgproc = "pypuff.cli:ctgproc_main"
 pymakegeo-lite = "pypuff.cli:makegeo_main"
-pypuff-usecase-wind = "pypuff.usecases.high_resolution_wind:main"
-pypuff-usecase-wildfire = "pypuff.usecases.wildfire:main"
-pypuff-usecase-evaluate = "pypuff.usecases.model_evaluation:main"
+pyterrel = "pypuff.cli:pyterrel_main"
 pypuff-doctor = "pypuff.doctor:main"
 
 [tool.setuptools.packages.find]

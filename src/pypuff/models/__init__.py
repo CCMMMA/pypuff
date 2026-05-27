@@ -11,5 +11,6 @@ __all__ = [
     "visualization",
     "pywrf",
     "pymet",
+    "pyterrel",
 ]
-from pypuff.models import pywrf, pymet
+from pypuff.models import pyterrel, pywrf, pymet

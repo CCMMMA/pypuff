@@ -44,3 +44,8 @@ The Gaussian backend can operate in `puff` or `plume` mode. The default `puff` m
 Starting with v0.4.2, high-resolution meteorological use cases use explicit clean-room module names.  `pypuff.models.pywrf` implements the former CALWRF role: WRF NetCDF access, field normalization, and meteo@uniparthenope WRF5 d03 downloading.  `pypuff.models.pymet` implements the former CALMET local interpolation role: centered local grids, deterministic vector interpolation, and NetCDF-CF meteorological output.
 
 Use case 01 calls PyWRF first and PyMET second.  Use case 02 reuses the same wind product before building a wildfire/arson source configuration.  This keeps the use cases consistent and prevents ad-hoc WRF parsing in scenario scripts.
+
+
+## PyTerrel terrain preprocessing
+
+PyTerrel is included as `pypuff.models.pyterrel` and the `pyterrel` CLI. It provides clean-room TERREL-role terrain interpolation and NetCDF-CF/JSON terrain outputs for PyMET, MAKEGEO, and dispersion workflows.

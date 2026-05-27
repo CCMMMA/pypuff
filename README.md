@@ -13,6 +13,7 @@ It provides shared configuration, legacy-control parsing, NetCDF-CF interoperabi
 | `pycalwrf` | `pypuff.models.calwrf` | Legacy-compatible WRF/NetCDF metadata adapter. |
 | PyWRF API | `pypuff.models.pywrf` | Clean-room WRF extraction/downloader, former CALWRF role. |
 | PyMET API | `pypuff.models.pymet` | Clean-room local diagnostic meteorology/downscaling, former CALMET role. |
+| `pyterrel` | `pypuff.models.pyterrel` | Clean-room terrain interpolation/preprocessing, former TERREL role. |
 | `pyctgproc` | `pypuff.models.ctgproc` | Land-use category aggregation. |
 | `pymakegeo-lite` | `pypuff.models.makegeo` | Terrain/land-use GEO table builder. |
 | `pycalmet` | `pypuff.models.calmet` | Diagnostic gridded meteorology builder. |
@@ -28,6 +29,7 @@ It provides shared configuration, legacy-control parsing, NetCDF-CF interoperabi
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install -U pip
+python -m pip install -r requirements.txt
 python -m pip install -e .[netcdf,viz]
 # optional MPI/HPC support
 python -m pip install -e .[netcdf,viz,mpi]
@@ -99,12 +101,12 @@ PyPuff includes a root-level `usecases/` folder with reproducible templates for:
 - arson/wildfire screening simulations using the same PyPuff configuration and output conventions as the main suite;
 - model evaluation against satellite-derived masks with a lightweight deterministic AI calibration layer.
 
-Install the package and run the dedicated entry points:
+Install the package, then run the root-level didactic scripts. The use cases are intentionally not importable suite modules:
 
 ```bash
-pypuff-usecase-wind --download-date 2026-05-27 --download-cycle-hour 0 --output wrf_100m_wind.nc --center-lat 40.85 --center-lon 14.27
-pypuff-usecase-wildfire --download-date 2026-05-27 --download-cycle-hour 0 --output-dir wildfire_case --center-lat 40.85 --center-lon 14.27 --temperature-k 1100
-pypuff-usecase-evaluate --concentration wildfire_case/model/concentration.nc --satellite-mask satellite_mask.json --output wildfire_case/evaluation.json
+python usecases/01_high_resolution_wind_field/run.py --download-date 2026-05-27 --download-cycle-hour 0 --output wrf_100m_wind.nc --center-lat 40.85 --center-lon 14.27
+python usecases/02_wildfire_arson_effects/run.py --download-date 2026-05-27 --download-cycle-hour 0 --output-dir wildfire_case --center-lat 40.85 --center-lon 14.27 --temperature-k 1100
+python usecases/03_satellite_ai_evaluation/run.py --concentration wildfire_case/model/concentration.nc --satellite-mask satellite_mask.json --output wildfire_case/evaluation.json
 ```
 
-The use cases prefer NetCDF-CF products when `netCDF4` is installed and fall back to JSON/CSV for lightweight runs and automated tests.
+The use cases prefer NetCDF-CF products when `netCDF4` is installed and fall back to JSON/CSV for lightweight runs and automated tests. They are documented examples under `usecases/`, not part of the `pypuff` package namespace.

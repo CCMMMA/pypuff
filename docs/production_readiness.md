@@ -48,3 +48,13 @@ python scripts/check_release.py
 ```
 
 The release check verifies required docs, use-case documentation, typed package metadata, and absence of Python bytecode/cache directories in the repository archive.
+
+
+## PyTerrel terrain preprocessing
+
+PyTerrel is included as `pypuff.models.pyterrel` and the `pyterrel` CLI. It provides clean-room TERREL-role terrain interpolation and NetCDF-CF/JSON terrain outputs for PyMET, MAKEGEO, and dispersion workflows.
+
+
+## Use-case packaging boundary
+
+The root-level didactic use cases are not package modules and are not exposed as installed CLI entry points. This keeps production suite APIs separated from educational scenario orchestration.
